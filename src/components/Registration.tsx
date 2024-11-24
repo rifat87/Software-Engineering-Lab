@@ -1,21 +1,20 @@
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FieldValues } from "react-hook-form";
+import { z } from "zod";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useState } from "react";
 import { BiHide, BiShow } from "react-icons/bi";
 import { Link, useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
-import Cookies from 'js-cookie';
+import Cookies from 'js-cookie'
 
 const stringValidationRules = {
   regex: /^[A-Za-z.]+(?: [A-Za-z.]+)*$/,
   refine: (value: string) => {
     const words = value.split(" ");
-    return words.every((word) => /^[A-Z][a-z.]*$/.test(word));
+    return words.every((word) => /^[A-Z][a-z.]*$/.test(word)); // Check if each word starts with an uppercase letter followed by lowercase letters
   },
 };
-
 const regSchema = z
   .object({
     usertype: z.enum(["Student", "Teacher", "Instructor"]),
@@ -26,6 +25,8 @@ const regSchema = z
         "Starting of each word must be uppercase letter"
       )
       .refine((value) => stringValidationRules.refine(value)),
+    // dept: z.string().refine((value) => value === "IRE" || value === "EdTech", {
+    //   message: 'Dept must be "IRE" or "EdTech"',
     dept: z.enum(["IRE", "EdTech"]),
 
     // session: z
@@ -81,8 +82,7 @@ type regData = z.infer<typeof regSchema>;
 type otpData = z.infer<typeof otpSchema>;
 
 const Registration = () => {
-
-    const {
+  const {
     register,
     handleSubmit,
     formState: { errors, isValid },
@@ -108,9 +108,109 @@ const Registration = () => {
 
   //Registration form data collected here
   const [regdata, setRegData] = useState<FieldValues>();
-  
-  return(
-<section
+
+  const onRegSubmit = async (data: FieldValues) => {
+    setRegData(data);
+
+    const regidata = data;
+    console.log("Data from reg: ", regidata);
+    try {
+      console.log("Hello");
+      const response = await axios.post(
+        "http://localhost:5000/signup/saveusers",
+        regidata
+      );
+      console.log("world");
+      console.log('response: ', response)
+      
+      if (response.status == 201) {
+        alert("User already exists. Now verify account with OTP.")
+        setSignup(true);
+      } else if(response.status == 202){
+        alert("Account already activated with this email. Please Log in.");
+        navigate("/login");
+      }else if(response.status == 200){
+        setSignup(true);
+        // console.log("User Registration failed.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      if(error.response.data.errors.id !=""){
+        alert(error.response.data.errors.id);
+      }
+      else if(error.response.data.errors.phone_no != ""){
+        alert(error.response.data.errors.phone_no);
+      }
+      else if(error.response.data.errors.Username != ""){
+        alert(error.response.data.errors.username);
+      }
+      console.log(error.response.data.errors);
+      
+    } // Log the response if needed
+  };
+
+  //Otp collected here
+  //verify email button cliked
+  const [showOtp, setShowOtp] = useState(false);
+
+  //Otp verify button clicked
+  const [onOtp, setOnOtp] = useState(false);
+
+  const navigate = useNavigate();
+
+  const sendOtp = async () => {
+    console.log("Reg Data: ", regdata); //send regdata for email
+    if (regdata != null) {
+      try {
+        const response = await axios.post(
+          "http://localhost:5000/signup/sendotp",
+          regdata
+        );
+        if (response.status == 200) {
+          setShowOtp(true);
+        }
+      } catch (error) {
+        console.log("Cannot go to OTP page error: ", error);
+      }
+    } else {
+      alert("Regdata is null");
+    }
+  };
+
+  const [message, setMessage] = useState("");
+  const onOtpSubmit = async (data: FieldValues) => {
+    const otpdata = data;
+    const fulldata = { ...regdata, ...otpdata };
+    console.log("OTP in frontend: ", { ...regdata, ...otpdata });
+
+    if (otpdata != null) {
+      try {
+        await axios.post("http://localhost:5000/users/register", fulldata);
+
+        setOnOtp(true);
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      } catch (error) {
+        if ((error as AxiosError).response?.status === 400) {
+          setMessage("OTP did not match");
+        } else {
+          console.error("Error:", error);
+        }
+      } // Log the response if needed
+    } else {
+      alert("Otp Api failed");
+    }
+  };
+
+  const [selectedOption, setSelectedOption] = useState("");
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedOption(e.target.value);
+  };
+  return (
+    
+      <section
         className="vh-auto bg-image"
         style={{
           backgroundImage:
@@ -524,5 +624,6 @@ const Registration = () => {
         </div>
       </section>
   );
-}
+};
+
 export default Registration;
