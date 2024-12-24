@@ -1,83 +1,44 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import "./Home.css";
+import { useLocation } from "react-router-dom";
+// import "./Home.css";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-
-
 const Profile = () => {
-
-  const location = useLocation();
-  const { logindata } = location.state || {};
+  // const location = useLocation();
+  // const { logindata } = location.state || {};
 
   const [userdata, setUserdata] = useState([]);
-  const [usertype, setUsertype] = useState("");
-  const [username, setUsername] = useState("");
-  const [name, setName] = useState("");
-  const [dept, setDept] = useState("");
-  const [session, setSession] = useState("");
-  const [userid, setUserid] = useState(null);
-  const [phone_no, setPhone_no] = useState("");
-  // const [userdata, setUserData] = useState(null)
+  // const [usertype, setUsertype] = useState("");
+  // const [username, setUsername] = useState("");
+  // const [name, setName] = useState("");
+  // const [dept, setDept] = useState("");
+  // const [session, setSession] = useState("");
+  // const [userid, setUserid] = useState(null);
+  // const [phone_no, setPhone_no] = useState("");
 
   const [togglebar, setTogglebar] = useState(false);
   const ShowHeader = () => {
     setTogglebar(!togglebar);
   };
 
-  const navigate = useNavigate();
   const fetchData = async () => {
     try {
-      console.log("hello");
+      // console.log("hello");
       const response = await axios.get(
-        "http://localhost:5000/profile/showdata",{
-          headers: {
-            Accept: "Application/json",
-            "Content-Type": "application/json"
-          },
-          withCredentials: true
-        });
-      if(response.status == 200){
+        "http://localhost:5000/profile/showdata"
+      );
       console.log("Response from db:", response.data);
       setUserdata(response.data);
-      }
-      // else if(response.status == 401){
-      //   console.log("This user is not permitted");
-      //   alert("You have no permission to view the page");
-      //   navigate("/login");
-      // }
+      // console.log("Hello");
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        console.log("This user is not permitted");
-        // alert("You have no permission to view the page");
-        navigate("/login");
-      } else {
-        console.error("Error fetching data:", error);
-      }
+      console.error("Error fetching data:", error);
     }
   };
 
-  const logout = async () =>{
-    try{
-      const res = await axios.get("http://localhost:5000/logout", {withCredentials: true});
-      if(res.status == 200){
-        navigate("/login");
-      }
-    }catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        // navigate("/login");
-        alert("Logout failed");
-        
-        // navigate("/login");
-      } else {
-        console.error("Error logout:", error);
-      }
-  }
-}
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [userdata]);
   return (
     <>
       <header className="header">
@@ -110,7 +71,6 @@ const Profile = () => {
               <li className="nav-menu-item">
                 <Link
                   to=""
-                  onClick={logout}
                   id="home-login-btn"
                   className="nav-menu-link text-decoration-none text-white"
                 >
@@ -136,35 +96,34 @@ const Profile = () => {
               <div className="card mb-4">
                 <div className="card-body text-center">
                   <img
-                    src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
+                    src="https://i.ibb.co.com/jvhZBwb/profilepic.jpg"
                     alt="avatar"
                     className="rounded-circle img-fluid"
                     style={{ width: "150px" }}
                   />
-                  <h5 className="my-3">{userdata.username}</h5>
+                  <h5 className="my-3">
+                    {userdata.username || "noman2001011"}
+                  </h5>
                   <p className="text-muted mb-1">
-                    User Type: {userdata.usertype}
+                    User Type: {userdata.usertype || "Student"}
                   </p>
                   <div className="d-grid col-6 mx-auto ">
-                    <button
-                      type="button"
-                      data-mdb-button-init
-                      data-mdb-ripple-init
-                      className="btn btn-outline-success mt-3 ms-1 mb-2"
+                    <Link
+                      to="/login/profile/products"
+                      className="text-decoration-none btn btn-outline-success ms-1 mb-2"
                     >
                       Instruments
-                    </button>
-
-                    <button
-                      type="button"
+                    </Link>
+                    <Link
                       data-mdb-button-init
                       data-mdb-ripple-init
                       className="btn btn-outline-success ms-1 mb-2"
+                      to="/login/profile/requestpage"
                     >
                       Requests
-                    </button>
+                    </Link>
                     <Link
-                      to="/login/profile/inventory"
+                      to="/login/profile/inventoryupdate"
                       className="text-decoration-none btn btn-outline-success ms-1 mb-2"
                     >
                       Inventory
@@ -193,7 +152,9 @@ const Profile = () => {
                       <p className="mb-0 fw-bold">Full Name</p>
                     </div>
                     <div className="col-sm-9">
-                      <p className=" mb-0">{userdata.name}</p>
+                      <p className=" mb-0">
+                        {userdata.name || "Md. Numanur Rahman"}
+                      </p>
                     </div>
                   </div>
                   <hr />
@@ -202,7 +163,7 @@ const Profile = () => {
                       <p className="mb-0 fw-bold">Department</p>
                     </div>
                     <div className="col-sm-9">
-                      <p className=" mb-0">{userdata.dept}</p>
+                      <p className=" mb-0">{userdata.dept || "IRE"}</p>
                     </div>
                   </div>
                   <hr />
@@ -211,7 +172,7 @@ const Profile = () => {
                       <p className="mb-0 fw-bold">Session</p>
                     </div>
                     <div className="col-sm-9">
-                      <p className=" mb-0">{userdata.session}</p>
+                      <p className=" mb-0">{userdata.session || "2020-21"}</p>
                     </div>
                   </div>
                   <hr />
@@ -220,7 +181,9 @@ const Profile = () => {
                       <p className="mb-0 fw-bold">User ID</p>
                     </div>
                     <div className="col-sm-9">
-                      <p className=" mb-0">{userdata.student_id}</p>
+                      <p className=" mb-0">
+                        {userdata.student_id || "2001011"}
+                      </p>
                     </div>
                   </div>
                   <hr />
@@ -229,7 +192,9 @@ const Profile = () => {
                       <p className="mb-0 fw-bold">Email</p>
                     </div>
                     <div className="col-sm-9">
-                      <p className=" mb-0">{userdata.email}</p>
+                      <p className=" mb-0">
+                        {userdata.email || "2001011@iot.bdu.ac.bd"}
+                      </p>
                     </div>
                   </div>
                   <hr />
@@ -238,7 +203,9 @@ const Profile = () => {
                       <p className="mb-0 fw-bold">Phone no</p>
                     </div>
                     <div className="col-sm-9">
-                      <p className=" mb-0">{userdata.phone_no}</p>
+                      <p className=" mb-0">
+                        {userdata.phone_no || "01627706835"}
+                      </p>
                     </div>
                   </div>
                 </div>
