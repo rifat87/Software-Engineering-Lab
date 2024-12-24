@@ -1,0 +1,65 @@
+.container-3 {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.section-title {
+  color: #333;
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.mytable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.mytable th,
+.mytable td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.mytable th {
+  background-color: #f4f4f4;
+}
+
+.mybtn {
+  padding: 5px 10px;
+  margin-right: 5px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-view {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-accept {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.btn-reject {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+.hover-effect:hover {
+  background-color: #2980b9;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
