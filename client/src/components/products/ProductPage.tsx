@@ -3,6 +3,7 @@ import { Item, items } from "./ItemData";
 import ItemCard from "./ItemCard";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 interface SelectedItem {
   id: number;
@@ -58,15 +59,28 @@ const ProductPage: React.FC = () => {
     }
   };
 
-
-
-  const handleSubmit = () => {
-    // Here you would typically send the data to your database
+  const handleSubmit = async () => {
     console.log("Submitting data:", selectedItems);
-    // After successful submission, you might want to clear the table
-    // handleClear();
-    alert("Data submitted successfully!"); // Replace with actual submission logic
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/submit-items", {
+        selectedItems,
+      });
+      console.log("API Response:", response.data);
+      alert("Data submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting data:", error);
+      alert("Failed to submit data. Please try again.");
+    }
   };
+
+
+
+  // const handleSubmit = () => {
+  //   console.log("Submitting data:", selectedItems);
+
+  //   alert("Data submitted successfully!");
+  // };
 
   return (
     <>
