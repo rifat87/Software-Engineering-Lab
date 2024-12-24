@@ -1,48 +1,12 @@
+// RequestTable.tsx
 import React, { useState } from "react";
-import "./RequestTable.css";
 import { Link } from "react-router-dom";
-
-interface Request {
-  id: number;
-  studentName: string;
-  studentId: string;
-  department: string;
-  session: string;
-  instruments: { name: string; quantity: number }[];
-  status: "pending" | "approved" | "rejected";
-}
+import { requestData, Request } from "./RequestData"; // Import the data
+import "./RequestTable.css";
+import axios from "axios";
 
 const RequestTable: React.FC = () => {
-  const [requests, setRequests] = useState<Request[]>([
-    {
-      id: 1,
-      studentName: "Md. Numanur Rahman",
-      studentId: "2001011",
-      department: "IRE",
-      session: "2020-21",
-      instruments: [
-        { name: "Arduino UNO R3", quantity: 1 },
-        { name: "IR Sensor", quantity: 2 },
-        { name: "Servo Motor", quantity: 4 },
-        { name: "ESP32", quantity: 1 },
-      ],
-      status: "pending",
-    },
-    {
-      id: 2,
-      studentName: "Md. Abeer Hasan",
-      studentId: "2002039",
-      department: "EdTE",
-      session: "2021-21",
-      instruments: [
-        { name: "Arduino UNO R3", quantity: 2 },
-        { name: "IR Sensor", quantity: 4 },
-        { name: "Servo Motor", quantity: 4 },
-        { name: "ESP32", quantity: 1 },
-      ],
-      status: "pending",
-    },
-  ]);
+  const [requests, setRequests] = useState<Request[]>(requestData);
 
   const handleViewInstruments = (
     instruments: { name: string; quantity: number }[]
@@ -53,20 +17,34 @@ const RequestTable: React.FC = () => {
     );
   };
 
-  const handleAccept = (id: number) => {
-    setRequests((prev) =>
-      prev.map((request) =>
-        request.id === id ? { ...request, status: "approved" } : request
-      )
-    );
+  const handleAccept = async (id: number) => {
+    try {
+      await axios.post("http://localhost:5000/api/acceptrequest", { id });
+      setRequests((prev) =>
+        prev.map((request) =>
+          request.id === id ? { ...request, status: "approved" } : request
+        )
+      );
+      alert("Request approved successfully!");
+    } catch (error) {
+      console.error("Error approving request:", error);
+      alert("Failed to approve the request.");
+    }
   };
 
-  const handleReject = (id: number) => {
-    setRequests((prev) =>
-      prev.map((request) =>
-        request.id === id ? { ...request, status: "rejected" } : request
-      )
-    );
+  const handleReject = async (id: number) => {
+    try {
+      await axios.post("http://localhost:5000/api/rejectrequest", { id });
+      setRequests((prev) =>
+        prev.map((request) =>
+          request.id === id ? { ...request, status: "rejected" } : request
+        )
+      );
+      alert("Request rejected successfully!");
+    } catch (error) {
+      console.error("Error rejecting request:", error);
+      alert("Failed to reject the request.");
+    }
   };
 
   const [togglebar, setTogglebar] = useState(false);
